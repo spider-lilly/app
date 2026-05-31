@@ -4,14 +4,15 @@ from django.db import models
 
 class User(AbstractUser):
     class Role(models.TextChoices):
-        USER = "user", "User"
+        STUDENT = "student", "Student"
+        OWNER = "owner", "Owner"
         ADMIN = "admin", "Admin"
 
     email = models.EmailField(unique=True)
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
-        default=Role.USER,
+        default=Role.STUDENT,
     )
 
     USERNAME_FIELD = "email"
