@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.contrib.gis.db import models
 
-from colleges.models import College
+from college.models import College
 
 
 # Image upload path

@@ -14,3 +14,10 @@ class IsOwner(BasePermission):
             request.user.is_authenticated
             and request.user.role == User.Role.OWNER
         )
+
+class IsPropertyOwner(BasePermission):
+    def has_object_permission(self,request,view,obj):
+        return(
+            request.user.is_authenticated
+            and obj.owner_id==request.user.id
+        )

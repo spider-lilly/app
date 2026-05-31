@@ -97,10 +97,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+    
     # Third-party
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 
     # Local
     "accounts",
@@ -278,6 +279,22 @@ REST_FRAMEWORK = {
 
         "rest_framework.permissions.AllowAny",
     ),
+
+    "DEFAULT_THROTTLE_CLASSES": (
+
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ),
+
+    "DEFAULT_THROTTLE_RATES": {
+
+        "anon": os.getenv("ANON_THROTTLE_RATE", "60/min"),
+        "user": os.getenv("USER_THROTTLE_RATE", "120/min"),
+        "property_list": os.getenv("PROPERTY_LIST_THROTTLE_RATE", "60/min"),
+    },
+
+    "EXCEPTION_HANDLER": "config.exceptions.api_exception_handler",
 }
 
 
