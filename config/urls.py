@@ -1,27 +1,42 @@
+# config/urls.py
+
 from django.contrib import admin
-from django.conf.urls.static import static
-from django.urls import include, path
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+
+from django.urls import (
+    path,
+    include,
+)
 
 from django.conf import settings
-
-
-@api_view(["GET"])
-def health_check(request):
-    return Response(
-        {
-            "message": "API running",
-            "debug": settings.DEBUG,
-        }
-    )
+from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path("", health_check),
-    path("admin/", admin.site.urls),
-    path("api/auth/", include("accounts.urls")),
+
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
+
+    path(
+        "api/auth/",
+        include("accounts.urls"),
+    ),
+
+    path(
+        "api/colleges/",
+        include("colleges.urls"),
+    ),
+
+    path(
+        "api/properties/",
+        include("properties.urls"),
+    ),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Media files
+urlpatterns += static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT,
+)
