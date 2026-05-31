@@ -2,8 +2,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.tokens import RefreshToken  
+import requests
+import os
+import urllib.parse
+from django.shortcuts import redirect
+from .models import User
 from .serializers import LoginSerializer, ProfileSerializer, RegisterSerializer
 
 
@@ -42,12 +46,6 @@ class ProfileView(APIView):
         serializer = ProfileSerializer(request.user)
         return Response(serializer.data)
 
-import os
-import urllib.parse
-
-from django.shortcuts import redirect
-from rest_framework.views import APIView
-
 
 class GoogleLoginView(APIView):
     authentication_classes = []
@@ -69,13 +67,7 @@ class GoogleLoginView(APIView):
         )
 
         return redirect(url)
-    
-import requests
 
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from .models import User
 
 class GoogleCallbackView(APIView):
     authentication_classes = []

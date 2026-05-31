@@ -11,6 +11,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
+GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
+
+if os.name == "nt":
+    osgeo_bin = Path(os.getenv("OSGEO4W_ROOT", "C:/OSGeo4W")) / "bin"
+    if osgeo_bin.exists():
+        os.add_dll_directory(str(osgeo_bin))
+
 
 def env_bool(name: str, default: bool = False) -> bool:
     value = os.getenv(name)
@@ -21,7 +29,7 @@ def env_bool(name: str, default: bool = False) -> bool:
 
 DEBUG = env_bool("DEBUG", False)
 SECRET_KEY = os.getenv("SECRET_KEY")
-
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
 if not SECRET_KEY:
     if DEBUG:
         SECRET_KEY = "dev-only-change-me"
@@ -39,6 +47,8 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.gis",
+    "django.contrib.postgres",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -78,10 +88,19 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=os.getenv("DATABASE_URL", ""),
         conn_max_age=600,
     )
 }
+
+if not DATABASES["default"]:
+    raise ImproperlyConfigured("DATABASE_URL must be set to a PostGIS-enabled PostgreSQL database.")
+
+if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
+    DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
+
+if DATABASES["default"]["ENGINE"] != "django.contrib.gis.db.backends.postgis":
+    raise ImproperlyConfigured("DATABASE_URL must point to a PostgreSQL/PostGIS database.")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -104,6 +123,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
